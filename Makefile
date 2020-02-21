@@ -6,8 +6,21 @@
 
 SHELL = /bin/bash
 
+QEMU ?= qemu-system-x86_64
+QEMU += -enable-kvm -m 4G -machine q35 -smp 4 -cpu host
+QEMU += -serial mon:stdio
+QEMU += -drive format=raw,file=/usr/share/ovmf/x64/OVMF_CODE.fd,readonly,if=pflash -drive format=raw,file=OVMF_VARS.fd,if=pflash
+
 .PHONY: all
 all: disk.img
+
+.PHONY: run-qemu
+run-qemu: | disk.img OVMF_VARS.fd
+	$(QEMU) $(QEMUFLAGS) -drive format=raw,file=disk.img
+
+.PRECIOUS: OVMF_VARS.fd
+OVMF_VARS.fd: /usr/share/ovmf/x64/OVMF_VARS.fd
+	cp $< $@
 
 .PRECIOUS: disk.img
 disk.img: | disk.sfdisk rootfs.tar mnt
