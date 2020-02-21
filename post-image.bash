@@ -12,6 +12,7 @@ cat <<EOF >>/etc/fstab
 /dev/sda1       /efi    vfat    defaults,umask=0077,x-systemd.automount,x-systemd.idle-timeout=1min 0       2
 EOF
 
+rm -f /etc/machine-id
 if ! [[ -L /boot/efi ]]
 then
 	ln -sf ../efi /boot/efi
