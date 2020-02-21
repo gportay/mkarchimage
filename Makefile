@@ -34,11 +34,13 @@ disk.img: | disk.sfdisk rootfs.tar mnt
 	mv $@.tmp $@
 
 .PRECIOUS: rootfs.tar
+rootfs.tar: override PACKAGES += systemd-resolvconf
 rootfs.tar: | pacman.conf rootfs
 	EUID=0 sudo -E \
-	     bash pacstrap -C pacman.conf rootfs base linux grub efibootmgr --needed
+	     bash pacstrap -C pacman.conf rootfs base linux grub efibootmgr $(PACKAGES) --needed
 	sudo bash arch-chroot rootfs \
 	     bash <post-rootfs.bash
+	sudo rsync -av overlay/. rootfs/.
 	sudo tar cf $@ -C rootfs .
 
 rootfs mnt:
@@ -77,6 +79,15 @@ grub-mkconfig: | disk.img mnt
 post-rootfs: | rootfs.tar rootfs
 	sudo bash arch-chroot rootfs \
 	     bash <post-rootfs.bash
+
+.PHONY: image-overlay
+image-overlay: | disk.img mnt
+	sudo bash image-mount-root.bash disk.img mnt \
+	     rsync -av overlay/. mnt/.
+
+.PHONY: overlay
+overlay: | rootfs.tar rootfs
+	sudo rsync -av overlay/. rootfs/.
 
 .PHONY: clean
 clean:

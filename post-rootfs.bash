@@ -24,3 +24,6 @@ cat <<EOF >/etc/hosts
 EOF
 
 echo "archlinux" >/etc/hostname
+
+systemctl enable systemd-networkd.service
+systemctl enable systemd-resolved.service
