@@ -18,5 +18,5 @@ then
 	ln -sf ../efi /boot/efi
 fi
 grub-install --no-nvram --removable --target=x86_64-efi --efi-directory=/efi
-cp /boot/initramfs-linux-fallback.img /boot/initramfs-linux.img
+mkinitcpio -p linux
 grub-mkconfig -o /boot/grub/grub.cfg
