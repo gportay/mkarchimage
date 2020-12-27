@@ -21,4 +21,5 @@ fi
 loopdev="$1"
 
 mkfs.msdos "$loopdev"p1
-mkfs.ext4 "$loopdev"p2
+mkfs.vfat "$loopdev"p2
+mkfs.ext4 "$loopdev"p3

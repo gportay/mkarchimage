@@ -13,7 +13,7 @@ then
 	cat <<EOF >&2
 Usage: ${0##*/} FILE MOUNTPOINT ARCHIVE [TAR_OPTIONS]
 
-Extract files from ARCHIVE to the root partition via loop device using FILE.
+Extract files from ARCHIVE to filesystems via loop device using FILE.
 EOF
 	exit 1
 fi

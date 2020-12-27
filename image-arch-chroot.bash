@@ -10,9 +10,8 @@ then
 	cat <<EOF >&2
 Usage: ${0##*/} FILE MOUNTPOINT [COMMAND [ARGS]]
 
-Mount both root and efi filesystems on MOUNTPOINT and MOUNTPOINT/efi via a loop
-device using FILE, run COMMAND (or interactive shell) with root directory set
-to MOUNTPOINT/root.
+Mount filesystems on MOUNTPOINT via a loop device using FILE, run COMMAND (or
+interactive shell) with root directory set to MOUNTPOINT/root.
 EOF
 	exit 1
 fi
