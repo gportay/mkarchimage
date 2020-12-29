@@ -13,6 +13,10 @@ QEMU += -spice port=5924,disable-ticketing -device virtio-serial-pci -device vir
 QEMU += -serial mon:stdio
 QEMU += -drive format=raw,file=/usr/share/ovmf/x64/OVMF_CODE.fd,readonly,if=pflash -drive format=raw,file=OVMF_VARS.fd,if=pflash
 
+ifndef SYSTEMD_BOOT
+PACKAGES += grub efibootmgr
+endif
+
 .PHONY: all
 all: disk.img
 
@@ -43,7 +47,7 @@ disk.img: | disk.sfdisk rootfs.tar mnt
 rootfs.tar: override PACKAGES += systemd-resolvconf
 rootfs.tar: | pacman.conf rootfs
 	EUID=0 sudo -E \
-	     bash pacstrap -C pacman.conf rootfs base linux grub efibootmgr $(PACKAGES) --needed
+	     bash pacstrap -C pacman.conf rootfs base linux $(PACKAGES) --needed
 	sudo bash arch-chroot rootfs \
 	     bash <post-rootfs.bash
 	sudo rsync -av overlay/. rootfs/.

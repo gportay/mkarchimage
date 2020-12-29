@@ -16,10 +16,39 @@ cat <<EOF >>/etc/fstab
 EOF
 
 rm -f /etc/machine-id
-if ! [[ -e /boot/efi ]] && ! ln -sf ../efi /boot/efi
+if [[ -x grub-install ]]
 then
-	echo "Warning: /boot/efi: Cannot create symlink!" >&2
+	if ! [[ -e /boot/efi ]] && ! ln -sf ../efi /boot/efi
+	then
+		echo "Warning: /boot/efi: Cannot create symlink!" >&2
+	fi
+	grub-install --no-nvram --removable --target=x86_64-efi --efi-directory=/efi
+	mkinitcpio -p linux
+	grub-mkconfig -o /boot/grub/grub.cfg
+	exit
 fi
-grub-install --no-nvram --removable --target=x86_64-efi --efi-directory=/efi
-mkinitcpio -p linux
-grub-mkconfig -o /boot/grub/grub.cfg
+
+mkdir -p /efi/loader
+cat <<EOF >/efi/loader/loader.conf
+default  arch.conf
+timeout  4
+console-mode max
+editor   no
+EOF
+
+dir="/boot"
+if ! mountpoint "$dir"
+then
+	cp /boot/initramfs-linux.img /efi
+	cp /boot/vmlinuz-linux /efi
+	dir="/efi"
+fi
+
+mkdir -p "$dir/loader/entries"
+cat <<EOF >"$dir/loader/entries/arch.conf"
+title   Arch Linux
+linux   /vmlinuz-linux
+initrd  /initramfs-linux.img
+options root=/dev/sda3 rw console=ttyS0
+EOF
+bootctl install
