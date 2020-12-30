@@ -33,76 +33,83 @@ OVMF_VARS.fd: /usr/share/ovmf/x64/OVMF_VARS.fd
 	cp $< $@
 
 .PRECIOUS: disk.img
+disk.img: EUID = 0
 disk.img: | disk.sfdisk rootfs.tar mnt
 	rm -f $@.tmp
 	fallocate --length 8G $@.tmp
 	sfdisk $@.tmp <disk.sfdisk
 	sfdisk --dump $@.tmp
-	sudo bash image-mkfs-all.bash $@.tmp mnt
-	sudo bash image-tar-root.bash $@.tmp mnt rootfs.tar
-	sudo bash image-arch-chroot.bash $@.tmp mnt bash <post-image.bash
+	sudo -E bash image-mkfs-all.bash $@.tmp mnt
+	sudo -E bash image-tar-root.bash $@.tmp mnt rootfs.tar
+	sudo -E bash image-arch-chroot.bash $@.tmp mnt bash <post-image.bash
 	mv $@.tmp $@
 
 .PRECIOUS: rootfs.tar
+rootfs.tar: EUID = 0
 rootfs.tar: override PACKAGES += systemd-resolvconf
 rootfs.tar: | pacman.conf rootfs
-	EUID=0 sudo -E \
-	     bash pacstrap -C pacman.conf rootfs base linux $(PACKAGES) --needed
-	sudo bash arch-chroot rootfs \
-	     bash <post-rootfs.bash
-	sudo rsync -av overlay/. rootfs/.
-	sudo tar cf $@ -C rootfs .
+	sudo -E bash pacstrap -C pacman.conf rootfs base linux $(PACKAGES) --needed
+	sudo -E arch-chroot rootfs \
+	        bash <post-rootfs.bash
+	sudo -E rsync -av overlay/. rootfs/.
+	sudo -E tar cf $@ -C rootfs .
 
 rootfs mnt:
 	mkdir -p $@
 
 .PHONY: image-arch-chroot
+image-arch-chroot: EUID = 0
 image-arch-chroot: TERM = linux
 image-arch-chroot: | disk.img mnt
-	sudo bash image-arch-chroot.bash disk.img mnt
+	sudo -E bash image-arch-chroot.bash disk.img mnt
 
 .PHONY: arch-chroot
+arch-chroot: EUID = 0
 arch-chroot: TERM = linux
 arch-chroot: | rootfs
-	sudo bash arch-chroot rootfs
+	sudo -E bash arch-chroot rootfs
 
 .PHONY: post-image
+post-image: EUID = 0
 post-image: | disk.img mnt
-	sudo bash image-arch-chroot.bash disk.img mnt \
-	     bash <post-image.bash
+	sudo -E bash image-arch-chroot.bash disk.img mnt \
+	        bash <post-image.bash
 
 .PHONY: image-mount
 image-mount: | disk.img mnt
-	sudo bash image-mount-root.bash disk.img mnt
+	sudo -E bash image-mount-root.bash disk.img mnt
 
 .PHONY: grub-install-removable
+grub-install-removable: EUID = 0
 grub-install-removable: | disk.img mnt
-	sudo bash image-arch-chroot.bash disk.img mnt \
-	     grub-install --no-nvram --removable --target=x86_64-efi --efi-directory=/efi
+	sudo -E bash image-arch-chroot.bash disk.img mnt \
+	        grub-install --no-nvram --removable --target=x86_64-efi --efi-directory=/efi
 
 .PHONY: grub-mkconfig
+grub-mkconfig: EUID = 0
 grub-mkconfig: | disk.img mnt
-	sudo bash image-arch-chroot.bash disk.img mnt \
-	     grub-mkconfig -o /boot/grub/grub.cfg
+	sudo -E bash image-arch-chroot.bash disk.img mnt \
+	        grub-mkconfig -o /boot/grub/grub.cfg
 
 .PHONY: post-rootfs
+post-rootfs: EUID = 0
 post-rootfs: | rootfs.tar rootfs
-	sudo bash arch-chroot rootfs \
-	     bash <post-rootfs.bash
+	sudo -E bash arch-chroot rootfs \
+	        bash <post-rootfs.bash
 
 .PHONY: image-overlay
 image-overlay: | disk.img mnt
-	sudo bash image-mount-root.bash disk.img mnt \
-	     rsync -av overlay/. mnt/.
+	sudo -E bash image-mount-root.bash disk.img mnt \
+	        rsync -av overlay/. mnt/.
 
 .PHONY: overlay
 overlay: | rootfs.tar rootfs
-	sudo rsync -av overlay/. rootfs/.
+	sudo -E rsync -av overlay/. rootfs/.
 
 .PHONY: clean
 clean:
 	rm -f disk.img rootfs.tar pacman.conf
-	sudo rm -Rf rootfs
+	sudo -E rm -Rf rootfs
 
 .PRECIOUS: pacman.conf.in
 pacman.conf.in:
