@@ -15,7 +15,6 @@ cat <<EOF >>/etc/fstab
 /dev/sda2       /boot   vfat    defaults                                                            0       2
 EOF
 
-rm -f /etc/machine-id
 if [[ -x grub-install ]]
 then
 	if ! [[ -e /boot/efi ]] && ! ln -sf ../efi /boot/efi
