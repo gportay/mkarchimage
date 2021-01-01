@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2020 Gaël PORTAY
+# Copyright (C) 2020-2021 Gaël PORTAY
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
@@ -12,10 +12,6 @@ QEMU += -vga virtio -display egl-headless,gl=on
 QEMU += -spice port=5924,disable-ticketing -device virtio-serial-pci -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 -chardev spicevmc,id=spicechannel0,name=vdagent
 QEMU += -serial mon:stdio
 QEMU += -drive format=raw,file=/usr/share/ovmf/x64/OVMF_CODE.fd,readonly,if=pflash -drive format=raw,file=OVMF_VARS.fd,if=pflash
-
-ifndef SYSTEMD_BOOT
-PACKAGES += grub efibootmgr
-endif
 
 .PHONY: all
 all: disk.img
@@ -78,18 +74,6 @@ post-image: | disk.img mnt
 .PHONY: image-mount
 image-mount: | disk.img mnt
 	sudo -E bash image-mount-root.bash disk.img mnt
-
-.PHONY: grub-install-removable
-grub-install-removable: EUID = 0
-grub-install-removable: | disk.img mnt
-	sudo -E bash image-arch-chroot.bash disk.img mnt \
-	        grub-install --no-nvram --removable --target=x86_64-efi --efi-directory=/efi
-
-.PHONY: grub-mkconfig
-grub-mkconfig: EUID = 0
-grub-mkconfig: | disk.img mnt
-	sudo -E bash image-arch-chroot.bash disk.img mnt \
-	        grub-mkconfig -o /boot/grub/grub.cfg
 
 .PHONY: post-rootfs
 post-rootfs: EUID = 0
