@@ -1,1 +1,1 @@
-# mkarchimage
+# mkarchlinux

@@ -1,6 +1,6 @@
 #  SPDX-License-Identifier: LGPL-2.1+
 #
-#  This file is part of mkarchimage.
+#  This file is part of mkarchlinux.
 #
 #  systemd is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License as published by
