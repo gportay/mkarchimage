@@ -1,6 +1,9 @@
 #!/bin/bash
-# Copyright © 2019 Collabora Ltd.
-# SPDX-License-Identifier: MIT
+#
+# Copyright (C) 2020 Gaël PORTAY
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
 
 set -e
 set -u
