@@ -15,6 +15,13 @@ cat <<EOF >>/etc/fstab
 /dev/sda2       /boot   vfat    defaults                                                            0       2
 EOF
 
+# Run pacman hook for dracut manually as it is a part of the overlay which is
+# install after the rootfs is built with pacstrap.
+if [[ -x /usr/bin/dracut ]]
+then
+	compgen -G usr/lib/modules/"*"/pkgbase | dracut-install.sh
+fi
+
 mkdir -p /efi/loader
 cat <<EOF >/efi/loader/loader.conf
 default  arch.conf
