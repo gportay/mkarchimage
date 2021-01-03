@@ -5,7 +5,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-
 set -e
 
 sed -e "s,^root:[^:]*:,root::," -i "/etc/shadow"
