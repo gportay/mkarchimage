@@ -1,0 +1,57 @@
+#
+# Copyright (C) 2021 Gaël PORTAY
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# For a description of the syntax of this configuration file, see
+# Documentation/kbuild/kconfig-language.rst.
+
+mainmenu "mkarchlinux Configuration"
+
+config PACKAGES
+	string packages
+	default "base linux"
+	help
+	  The specified packages will be installed. If no packages are
+	  specified to be installed, the base meta package will be installed.
+	  
+	  Whitespace separated list of packages to install.
+	  
+	  https://wiki.archlinux.org/index.php/installation_guide#Install_essential_packages
+
+config TIMEZONE
+	string timezone
+	default "America/Montreal"
+	help
+	  The time-zone to symlink to /etc/localtime.
+	  
+	  Filename relative to /usr/share/zoneinfo.
+	  
+	  https://wiki.archlinux.org/index.php/installation_guide#Time_zone
+
+config LOCALES
+	string locales
+	default "en_CA.UTF-8 UTF-8:fr_CA.UTF-8 UTF-8:en_US.UTF-8 UTF-8"
+	help
+	  The locales to uncomment in /etc/locale.gen.
+	  
+	  Colon separated list of locales to generate.
+	  
+	  https://wiki.archlinux.org/index.php/installation_guide#Localization
+
+config HOSTNAME
+	string hostname
+	default "archlinux"
+	help
+	  The hostname to set in /etc/hostname and entry to add in /etc/hosts.
+	  
+	  https://wiki.archlinux.org/index.php/installation_guide#Network_configuration
+
+config IMAGE_SIZE
+	string "Image Size"
+	default "8G"
+	help
+	  Specify the image size in sectors. The number may be followed by the
+	  multiplicative suffixes (KiB, MiB, GiB, TiB, PiB, EiB, ZiB and YiB),
+	  then it's interpreted as size in bytes and the size is aligned
+	  according to device I/O limits.

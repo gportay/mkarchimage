@@ -15,6 +15,38 @@ QEMU += -drive format=raw,file=/usr/share/ovmf/x64/OVMF_CODE.fd,readonly,if=pfla
 
 PACKAGES += dracut
 
+# Strip quotes and then whitespaces
+qstrip = $(strip $(subst ",,$(1)))
+
+-include .config
+
+.SILENT: _all
+_all: all | .config
+
+.SILENT: .config
+.config:
+	echo "Please configure first (e.g. "make menuconfig"))" >&2
+	false
+
+.PHONY: menuconfig
+menuconfig:
+	kconfig-mconf Kconfig
+
+.PHONY: nconfig
+nconfig:
+	kconfig-nconf Kconfig
+
+.PHONY: config
+config:
+	kconfig-conf --oldaskconfig Kconfig
+
+PACKAGES += $(call qstrip,$(CONFIG_PACKAGES))
+HAVE_TIMEZONE = $(call qstrip,$(CONFIG_TIMEZONE))
+HAVE_LOCALES = $(call qstrip,$(CONFIG_LOCALES))
+HAVE_HOSTNAME = $(call qstrip,$(CONFIG_HOSTNAME))
+IMAGE_SIZE = $(call qstrip,$(CONFIG_IMAGE_SIZE))
+export HAVE_TIMEZONE HAVE_LOCALES HAVE_HOSTNAME
+
 .PHONY: all
 all: disk.img
 
@@ -34,7 +66,7 @@ OVMF_VARS.fd: /usr/share/ovmf/x64/OVMF_VARS.fd
 disk.img: EUID = 0
 disk.img: | disk.sfdisk rootfs.tar mnt
 	rm -f $@.tmp
-	fallocate --length 8G $@.tmp
+	fallocate --length $(IMAGE_SIZE) $@.tmp
 	sfdisk $@.tmp <disk.sfdisk
 	sfdisk --dump $@.tmp
 	sudo -E bash image-mkfs-all.bash $@.tmp mnt
@@ -46,7 +78,7 @@ disk.img: | disk.sfdisk rootfs.tar mnt
 rootfs.tar: EUID = 0
 rootfs.tar: override PACKAGES += systemd-resolvconf
 rootfs.tar: | pacman.conf rootfs
-	sudo -E bash pacstrap -C pacman.conf rootfs base linux $(PACKAGES) --needed
+	sudo -E bash pacstrap -C pacman.conf rootfs $(PACKAGES) --needed
 	sudo -E arch-chroot rootfs \
 	        bash <post-rootfs.bash
 	sudo -E rsync -av overlay/. rootfs/.
@@ -91,6 +123,10 @@ image-overlay: | disk.img mnt
 .PHONY: overlay
 overlay: | rootfs.tar rootfs
 	sudo -E rsync -av overlay/. rootfs/.
+
+.PHONY: mrproper
+mrproper: clean
+	rm -f .config
 
 .PHONY: clean
 clean:
