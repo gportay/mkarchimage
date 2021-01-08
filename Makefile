@@ -130,7 +130,7 @@ mrproper: clean
 
 .PHONY: clean
 clean:
-	rm -f disk.img rootfs.tar pacman.conf
+	rm -f disk.sfdisk disk.img rootfs.tar pacman.conf
 	sudo -E rm -Rf rootfs
 
 .PRECIOUS: pacman.conf.in
@@ -154,3 +154,18 @@ pacman.conf: pacman.conf.in
 		echo "Include = mirrorlist" >>$@.tmp; \
 	done
 	mv $@.tmp $@
+
+disk.sfdisk: CPPFLAGS += -DROOT_PARTITION_NAME="$(call qstrip,$(CONFIG_ROOT_PARTITION_NAME))"
+disk.sfdisk: CPPFLAGS += -DROOT_PARTITION_SIZE="$(call qstrip,$(CONFIG_ROOT_PARTITION_SIZE))"
+disk.sfdisk: CPPFLAGS += -DEFI_SYSTEM_PARTITION_NAME="$(call qstrip,$(CONFIG_EFI_SYSTEM_PARTITION_NAME))"
+disk.sfdisk: CPPFLAGS += -DEFI_SYSTEM_PARTITION_SIZE="$(call qstrip,$(CONFIG_EFI_SYSTEM_PARTITION_SIZE))"
+disk.sfdisk: CPPFLAGS += -DEXTENDED_BOOT_LOADER_PARTITION_NAME="$(call qstrip,$(CONFIG_EXTENDED_BOOT_LOADER_PARTITION_NAME))"
+disk.sfdisk: CPPFLAGS += -DEXTENDED_BOOT_LOADER_PARTITION_SIZE="$(call qstrip,$(CONFIG_EXTENDED_BOOT_LOADER_PARTITION_SIZE))"
+disk.sfdisk: .config
+
+CPP = cpp -P
+PREPROCESS.p = $(CPP) $(CPPFLAGS)
+OUTPUT_OPTION = -o $@
+
+%: %.p
+	$(PREPROCESS.p) $(OUTPUT_OPTION) $<
