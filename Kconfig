@@ -56,6 +56,10 @@ config IMAGE_SIZE
 	  then it's interpreted as size in bytes and the size is aligned
 	  according to device I/O limits.
 
+config READ_ONLY
+	bool read-only
+	select HAVE_VARIABLE_DATA_PARTITION
+
 menu "GUID Partition Table"
 
 config FORCE_PARTITIONS

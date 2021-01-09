@@ -1,0 +1,10 @@
+[Unit]
+Description=Volatile Root Home Directory (/root)
+Documentation=man:systemd.mount(5)
+ConditionPathIsReadWrite=!/root/
+Before=local-fs.target
+
+[Mount]
+What=tmpfs
+Where=/root
+Type=tmpfs

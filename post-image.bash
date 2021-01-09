@@ -103,11 +103,23 @@ EOF
 	unset mountpoint parttype dev partuuid
 fi
 
+if [[ "$READ_ONLY" ]]
+then
+	parttype="4f68bce3-e8cd-4db1-96e7-fbcaf984b709"
+	read -r dev partuuid < <(find_device_by_partuuid "$parttype")
+
+	tune2fs -O read-only "$dev"
+	mount -o remount,ro /
+	options+=("ro")
+
+	unset parttype dev partuuid
+fi
+
 mkdir -p "$dir/loader/entries"
 cat <<EOF >"$dir/loader/entries/arch.conf"
 title   Arch Linux
 linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
-options rw console=ttyS0
+options ${options[*]} console=ttyS0
 EOF
 bootctl install --no-variables
