@@ -101,6 +101,23 @@ do
 		where="/srv"
 		;;
 
+	# Temporary Data Partition
+	#
+	# Any native, optionally in LUKS
+	#
+	# The first partition with this type UUID on the disk containing the
+	# root partition is automatically mounted to /var/tmp/. If the
+	# partition is encrypted with LUKS, the device mapper file will be
+	# named /dev/mapper/tmp. Note that the intended mount point is indeed
+	# /var/tmp/, not /tmp/. The latter is typically maintained in memory
+	# via tmpfs and does not require a partition on disk. In some cases it
+	# might be desirable to make /tmp/ persistent too, in which case it is
+	# recommended to make it a symlink or bind mount to /var/tmp/, thus not
+	# requiring its own partition type UUID.
+	7ec6f557-3bc5-4aca-b293-16ef5df639d1) # Temporary Data Partition
+		where="/var/tmp"
+		;;
+
 	# Swap
 	#
 	# Swap
@@ -159,7 +176,8 @@ mount "${wheres[/]}" "$mountpoint"
 trap 'set +e; umount -Rf "$mountpoint"; set -e' 0
 unset wheres[/]
 
-for where in "${!wheres[@]}"
+mapfile -t mountpoints < <(printf "%s\n" "${!wheres[@]}" | sort)
+for where in "${mountpoints[@]}"
 do
 	mkdir -p "$mountpoint$where"
 	mount "${wheres[$where]}" "$mountpoint$where"
