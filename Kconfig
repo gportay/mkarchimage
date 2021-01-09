@@ -67,6 +67,8 @@ config FORCE_PARTITIONS
 
 config HAVE_ROOT_PARTITION
 	bool "Root Partition"
+	default "2G" if HAVE_HOME_PARTITION
+	default ""
 	help
 	  Any native, optionally in LUKS.
 	  
@@ -113,6 +115,32 @@ config USR_PARTITION_NAME
 	string "/usr Partition Name"
 	default "usr"
 	depends on HAVE_USR_PARTITION
+	help
+
+config HAVE_HOME_PARTITION
+	bool "Home Partition"
+	help
+	  Any native, optionally in LUKS.
+	  
+	  The first partition with this type UUID on the disk containing the
+	  root partition is automatically mounted to /home/. If the partition
+	  is encrypted with LUKS, the device mapper file will be named
+	  /dev/mapper/home.
+
+config HOME_PARTITION_SIZE
+	string "Home Partition Size"
+	default ""
+	depends on HAVE_HOME_PARTITION
+	help
+	  Specify the partition size in sectors. The number may be followed by
+	  the multiplicative suffixes (KiB, MiB, GiB, TiB, PiB, EiB, ZiB and
+	  YiB), then it's interpreted as size in bytes and the size is aligned
+	  according to device I/O limits.
+
+config HOME_PARTITION_NAME
+	string "Home Partition Name"
+	default "home"
+	depends on HAVE_HOME_PARTITION
 	help
 
 config HAVE_VARIABLE_DATA_PARTITION

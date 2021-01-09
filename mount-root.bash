@@ -102,6 +102,18 @@ do
 		where="/"
 		;;
 
+	# Home Partition
+	#
+	# Any native, optionally in LUKS.
+	#
+	# The first partition with this type UUID on the disk
+	# containing the root partition is automatically mounted to
+	# /home/. If the partition is encrypted with LUKS, the device
+	# mapper file will be named /dev/mapper/home.
+	933ac7e1-2eb4-4f13-b844-0e14e2aef915) # Home Partition
+		where="/home"
+		;;
+
 	*)
 		echo "$what: $parttype: Ignoring partition type" >&2
 		;;
