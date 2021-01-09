@@ -304,4 +304,39 @@ config EXTENDED_BOOT_LOADER_PARTITION_NAME
 	depends on HAVE_EXTENDED_BOOT_LOADER_PARTITION
 	help
 
+config HAVE_OTHER_DATA_PARTITION
+	bool "Other Data Partition"
+	help
+	  Any native, optionally in LUKS.
+	  
+	  No automatic mounting takes place for other Linux data partitions.
+	  This partition type should be used for all partitions that carry
+	  Linux file systems. The installer needs to mount them explicitly via
+	  entries in /etc/fstab. Optionally, these partitions may be encrypted
+	  with LUKS.
+
+config OTHER_DATA_PARTITION_SIZE
+	string "Other Data Partition Size"
+	default "5G"
+	depends on HAVE_OTHER_DATA_PARTITION
+	help
+	  Specify the partition size in sectors. The number may be followed by
+	  the multiplicative suffixes (KiB, MiB, GiB, TiB, PiB, EiB, ZiB and
+	  YiB), then it's interpreted as size in bytes and the size is aligned
+	  according to device I/O limits.
+
+config OTHER_DATA_PARTITION_NAME
+	string "Other Data Partition Name"
+	default "data"
+	depends on HAVE_OTHER_DATA_PARTITION
+	help
+
+config OTHER_DATA_FILESYSTEM_MOUNTPOINT
+	string "mountpoint"
+	default "/data"
+	help
+	  The mountpoint where to mount the filesystem.
+	  
+	  Absolute path to set in fstab (second-field).
+
 endmenu

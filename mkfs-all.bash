@@ -116,6 +116,19 @@ do
 		type="ext4"
 		;;
 
+	# Other Data Partitions
+	#
+	# Any native, optionally in LUKS
+	#
+	# No automatic mounting takes place for other Linux data partitions.
+	# This partition type should be used for all partitions that carry
+	# Linux file systems. The installer needs to mount them explicitly via
+	# entries in /etc/fstab.  Optionally, these partitions may be encrypted
+	# with LUKS.
+	0fc63daf-8483-4772-8e79-3d69d8477de4) # Other Data Partitions
+		type="ext4"
+		;;
+
 	# Swap
 	#
 	# Swap

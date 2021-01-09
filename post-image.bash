@@ -88,6 +88,21 @@ EOF
 	unset parttype dev partuuid
 fi
 
+if [[ "$HAVE_OTHER_DATA_PARTITION" ]] && [[ "$OTHER_DATA_FILESYSTEM_MOUNTPOINT" ]]
+then
+	parttype="0fc63daf-8483-4772-8e79-3d69d8477de4"
+	read -r dev partuuid < <(find_device_by_partuuid "$parttype")
+
+	mountpoint="$OTHER_DATA_FILESYSTEM_MOUNTPOINT"
+	mkdir -p "$mountpoint"
+
+	cat <<EOF >>/etc/fstab
+PARTUUID=$partuuid $mountpoint ext4 defaults 0 0
+EOF
+
+	unset mountpoint parttype dev partuuid
+fi
+
 mkdir -p "$dir/loader/entries"
 cat <<EOF >"$dir/loader/entries/arch.conf"
 title   Arch Linux
