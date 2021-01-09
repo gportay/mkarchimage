@@ -37,6 +37,32 @@ then
 	dir="/efi"
 fi
 
+if [[ "$HAVE_VARIABLE_DATA_PARTITION" ]]
+then
+	# TODO: To remove favour of systemd-gpt-auto-generator(8).
+	for what in "${LOOPDEVICE}"p*
+	do
+		[[ -b "$what" ]] || continue
+
+		read -r parttype partuuid < <(lsblk --output PARTTYPE,PARTUUID --noheadings "$what")
+		if [[ "${parttype:-}" != "4d21b016-b534-45c2-a9fb-5c16e091fd2d" ]] || \
+		   [[ ! "${partuuid:-}" ]]
+		then
+			continue
+		fi
+
+		cat <<EOF >>/etc/fstab
+PARTUUID=$partuuid /var ext4 defaults 0 0
+EOF
+
+		unset parttype partuuid
+
+		break
+	done
+
+	unset what
+fi
+
 mkdir -p "$dir/loader/entries"
 cat <<EOF >"$dir/loader/entries/arch.conf"
 title   Arch Linux

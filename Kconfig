@@ -92,6 +92,35 @@ config ROOT_PARTITION_NAME
 	depends on HAVE_ROOT_PARTITION
 	help
 
+config HAVE_VARIABLE_DATA_PARTITION
+	bool "Variable Data Partition"
+	help
+	  Any native, optionally in LUKS.
+	  
+	  The first partition with this type UUID on the disk containing the
+	  root partition is automatically mounted to /var/ — under the
+	  condition that its partition UUID matches the first 128 bit of
+	  HMAC-SHA256(machine-id, 0x4d21b016b53445c2a9fb5c16e091fd2d) (i.e. the
+	  SHA256 HMAC hash of the binary type UUID keyed by the machine ID as
+	  read from /etc/machine-id. This special requirement is made because
+	  /var/ (unlike the other partition types listed here) is inherently
+	  private to a specific installation and cannot possibly be shared
+	  between multiple OS installations on the same disk, and thus should
+	  be bound to a specific instance of the OS, identified by its machine
+	  ID. If the partition is encrypted with LUKS, the device mapper file
+	  will be named /dev/mapper/var.
+
+config VARIABLE_DATA_PARTITION_SIZE
+	string "Variable Data Partition Size"
+	default "2G"
+	depends on HAVE_VARIABLE_DATA_PARTITION
+
+config VARIABLE_DATA_PARTITION_NAME
+	string "Variable Data Partition Name"
+	default "var"
+	depends on HAVE_VARIABLE_DATA_PARTITION
+	help
+
 config HAVE_EFI_SYSTEM_PARTITION
 	bool "EFI System Partition"
 	help

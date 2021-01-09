@@ -27,4 +27,5 @@ shift
 LOOPDEVICE="$dev"
 export LOOPDEVICE
 
+udevadm trigger --subsystem-match=block --settle
 eval "${@:-bash}"
