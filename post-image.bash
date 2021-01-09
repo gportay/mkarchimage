@@ -116,10 +116,17 @@ then
 fi
 
 mkdir -p "$dir/loader/entries"
-cat <<EOF >"$dir/loader/entries/arch.conf"
-title   Arch Linux
-linux   /vmlinuz-linux
-initrd  /initramfs-linux.img
+for i in /boot/initramfs-*.img
+do
+	[[ -e "$i" ]] || continue
+	pkgbase="${i%.img}"
+	pkgbase="${pkgbase#/boot/initramfs-}"
+	IFS=- read -a pkgbases <<<"$pkgbase"
+	cat <<EOF >"$dir/loader/entries/arch-$pkgbase.conf"
+title   Arch ${pkgbases[*]^}
+linux   /vmlinuz-${pkgbases[0]}
+initrd  /initramfs-$pkgbase.img
 options ${options[*]} console=ttyS0
 EOF
+done
 bootctl install --no-variables
