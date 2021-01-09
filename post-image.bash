@@ -44,4 +44,4 @@ linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
 options rw console=ttyS0
 EOF
-bootctl install
+bootctl install --no-variables
