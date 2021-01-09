@@ -42,6 +42,6 @@ cat <<EOF >"$dir/loader/entries/arch.conf"
 title   Arch Linux
 linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
-options root=/dev/sda3 rw console=ttyS0
+options rw console=ttyS0
 EOF
 bootctl install
