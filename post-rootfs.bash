@@ -18,9 +18,11 @@ for i in "${locales[@]}"
 do
 	sed -e "/^#${i//./\\.}/s,^#,," -i /etc/locale.gen
 done
+sed -e '/^#/d' /etc/locale.gen
 locale-gen
 read -a lang <<<"${locales[0]}"
 echo "LANG=${lang[0]}" >/etc/locale.conf
+cat /etc/locale.conf
 
 hostname="${HAVE_HOSTNAME:-archlinux}"
 IFS=. read -a domains <<<"$hostname"
@@ -31,8 +33,10 @@ cat <<EOF >/etc/hosts
 ::1		localhost
 127.0.1.1	$hostname.localdomain	${domains[0]}
 EOF
+cat /etc/hosts
 
 echo "$hostname" >/etc/hostname
+cat /etc/hostname
 
 systemctl enable systemd-networkd.service
 systemctl enable systemd-resolved.service

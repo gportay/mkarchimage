@@ -31,11 +31,13 @@ find_device_by_partuuid() {
 }
 
 sed -e "s,^root:[^:]*:,root::," -i "/etc/shadow"
+cat /etc/shadow
 
 cat <<EOF >>/etc/fstab
 /dev/sda1       /efi    vfat    defaults,umask=0077,x-systemd.automount,x-systemd.idle-timeout=1min 0       2
 /dev/sda2       /boot   vfat    defaults                                                            0       2
 EOF
+cat /etc/fstab
 
 if [[ "$HAVE_USR_PARTITION" ]]
 then
@@ -49,6 +51,7 @@ then
 # <file system> <dir> <type> <options> <dump> <pass>
 PARTUUID=$partuuid /usr auto defaults 0 0
 EOF
+	cat /etc/fstab.sys
 
 	unset parttype dev partuuid
 fi
@@ -67,6 +70,7 @@ timeout  4
 console-mode max
 editor   no
 EOF
+cat /efi/loader/loader.conf
 
 dir="/boot"
 if ! mountpoint "$dir"
@@ -84,6 +88,7 @@ then
 	cat <<EOF >>/etc/fstab
 PARTUUID=$partuuid /var ext4 defaults 0 0
 EOF
+	cat /etc/fstab
 
 	unset parttype dev partuuid
 fi
@@ -99,6 +104,7 @@ then
 	cat <<EOF >>/etc/fstab
 PARTUUID=$partuuid $mountpoint ext4 defaults 0 0
 EOF
+	cat /etc/fstab
 
 	unset mountpoint parttype dev partuuid
 fi
@@ -128,5 +134,6 @@ linux   /vmlinuz-${pkgbases[0]}
 initrd  /initramfs-$pkgbase.img
 options ${options[*]} console=ttyS0
 EOF
+	cat "$dir/loader/entries/arch-$pkgbase.conf"
 done
 bootctl install --no-variables
