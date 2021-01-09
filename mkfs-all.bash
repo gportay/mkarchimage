@@ -87,6 +87,16 @@ do
 		type="ext4"
 		;;
 
+	# Swap
+	#
+	# Swap
+	#
+	# All swap partitions on the disk containing the root partition are
+	# automatically enabled.
+	0657fd6d-a4ab-43c4-84e5-0933c84b4f4f) # Swap
+		type="swap"
+		;;
+
 	# Root Partition
 	#
 	# Any native, optionally in LUKS
@@ -127,5 +137,11 @@ done
 
 for what in "${!whats[@]}"
 do
-	"mkfs.${whats[$what]}" "$what"
+	type="${whats[$what]}"
+	if [[ "$type" == "swap" ]]
+	then
+		mkswap "$what"
+	else
+		"mkfs.${whats[$what]}" "$what"
+	fi
 done

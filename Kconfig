@@ -172,6 +172,30 @@ config VARIABLE_DATA_PARTITION_NAME
 	depends on HAVE_VARIABLE_DATA_PARTITION
 	help
 
+config HAVE_SWAP_PARTITION
+	bool "Swap"
+	help
+	  Swap
+	  
+	  All swap partitions on the disk containing the root partition are
+	  automatically enabled.
+
+config SWAP_PARTITION_SIZE
+	string "Partition Size"
+	default "512M"
+	depends on HAVE_SWAP_PARTITION
+	help
+	  Specify the partition size in sectors. The number may be followed by
+	  the multiplicative suffixes (KiB, MiB, GiB, TiB, PiB, EiB, ZiB and
+	  YiB), then it's interpreted as size in bytes and the size is aligned
+	  according to device I/O limits.
+
+config SWAP_PARTITION_NAME
+	string "Partition Name"
+	default "swap"
+	depends on HAVE_SWAP_PARTITION
+	help
+
 config HAVE_EFI_SYSTEM_PARTITION
 	bool "EFI System Partition"
 	help
