@@ -87,6 +87,18 @@ do
 		type="ext4"
 		;;
 
+	# Server Data Partition
+	#
+	# Any native, optionally in LUKS
+	#
+	# The first partition with this type UUID on the disk containing the
+	# root partition is automatically mounted to /srv/. If the partition is
+	# encrypted with LUKS, the device mapper file will be named
+	# /dev/mapper/srv.
+	3b8f8425-20e0-4f3b-907f-1a25a76f98e8) # Server Data Partition
+		type="ext4"
+		;;
+
 	# Swap
 	#
 	# Swap

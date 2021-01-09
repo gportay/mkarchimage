@@ -143,6 +143,28 @@ config HOME_PARTITION_NAME
 	depends on HAVE_HOME_PARTITION
 	help
 
+config HAVE_SERVER_DATA_PARTITION
+	bool "Server Data Partition"
+	help
+	  Any native, optionally in LUKS.
+	  
+	  The first partition with this type UUID on the disk containing the
+	  root partition is automatically mounted to /srv/. If the partition is
+	  encrypted with LUKS, the device mapper file will be named
+	  /dev/mapper/srv.
+
+config SERVER_DATA_PARTITION_SIZE
+	string "Server Data Partition Size"
+	default "2G"
+	depends on HAVE_SERVER_DATA_PARTITION
+	help
+
+config SERVER_DATA_PARTITION_NAME
+	string "Server Data Partition Name"
+	default "var"
+	depends on HAVE_SERVER_DATA_PARTITION
+	help
+
 config HAVE_VARIABLE_DATA_PARTITION
 	bool "Variable Data Partition"
 	help
