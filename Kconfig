@@ -92,6 +92,29 @@ config ROOT_PARTITION_NAME
 	depends on HAVE_ROOT_PARTITION
 	help
 
+config HAVE_USR_PARTITION
+	bool "/usr/ Partition"
+	help
+	  Any native, optionally in LUKS.
+	  
+	  Similar semantics to root partition, but just the /usr/ partition.
+
+config USR_PARTITION_SIZE
+	string "/usr/ Partition Size"
+	default "2G"
+	depends on HAVE_USR_PARTITION
+	help
+	  Specify the partition size in sectors. The number may be followed by
+	  the multiplicative suffixes (KiB, MiB, GiB, TiB, PiB, EiB, ZiB and
+	  YiB), then it's interpreted as size in bytes and the size is aligned
+	  according to device I/O limits.
+
+config USR_PARTITION_NAME
+	string "/usr Partition Name"
+	default "usr"
+	depends on HAVE_USR_PARTITION
+	help
+
 config HAVE_VARIABLE_DATA_PARTITION
 	bool "Variable Data Partition"
 	help

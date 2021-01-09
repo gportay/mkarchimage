@@ -80,6 +80,15 @@ do
 		where="/var"
 		;;
 
+	# /usr/ Partition
+	#
+	# Any native, optionally in LUKS.
+	#
+	# Similar semantics to root partition, but just the /usr/ partition.
+	8484680c-9521-48c6-9c11-b0720656f69e) # /usr/ Partition (x86-64)
+		where="/usr"
+		;;
+
 	# Root Partition
 	#
 	# Any native, optionally in LUKS

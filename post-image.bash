@@ -7,12 +7,51 @@
 
 set -e
 
+find_device_by_partuuid() {
+	local what
+
+	for what in "${LOOPDEVICE}"p*
+	do
+		local parttype partuuid
+		[[ -b "$what" ]] || continue
+
+		read -r parttype partuuid < <(lsblk --output PARTTYPE,PARTUUID --noheadings "$what")
+		if [[ "${parttype:-}" != "$1" ]] || \
+		   [[ ! "${partuuid:-}" ]]
+		then
+			continue
+		fi
+
+		echo "$what" "$partuuid"
+		return 0
+	done
+
+	echo "PARTUUID=$1: No such device" >&2
+	return 1
+}
+
 sed -e "s,^root:[^:]*:,root::," -i "/etc/shadow"
 
 cat <<EOF >>/etc/fstab
 /dev/sda1       /efi    vfat    defaults,umask=0077,x-systemd.automount,x-systemd.idle-timeout=1min 0       2
 /dev/sda2       /boot   vfat    defaults                                                            0       2
 EOF
+
+if [[ "$HAVE_USR_PARTITION" ]]
+then
+	parttype="8484680c-9521-48c6-9c11-b0720656f69e"
+	read -r dev partuuid < <(find_device_by_partuuid "$parttype")
+
+	cat <<EOF >/etc/fstab.sys
+# Static information about the filesystems.
+# See fstab(5) for details.
+
+# <file system> <dir> <type> <options> <dump> <pass>
+PARTUUID=$partuuid /usr auto defaults 0 0
+EOF
+
+	unset parttype dev partuuid
+fi
 
 # Run pacman hook for dracut manually as it is a part of the overlay which is
 # install after the rootfs is built with pacstrap.
@@ -39,28 +78,14 @@ fi
 
 if [[ "$HAVE_VARIABLE_DATA_PARTITION" ]]
 then
-	# TODO: To remove favour of systemd-gpt-auto-generator(8).
-	for what in "${LOOPDEVICE}"p*
-	do
-		[[ -b "$what" ]] || continue
+	parttype="4d21b016-b534-45c2-a9fb-5c16e091fd2d"
+	read -r dev partuuid < <(find_device_by_partuuid "$parttype")
 
-		read -r parttype partuuid < <(lsblk --output PARTTYPE,PARTUUID --noheadings "$what")
-		if [[ "${parttype:-}" != "4d21b016-b534-45c2-a9fb-5c16e091fd2d" ]] || \
-		   [[ ! "${partuuid:-}" ]]
-		then
-			continue
-		fi
-
-		cat <<EOF >>/etc/fstab
+	cat <<EOF >>/etc/fstab
 PARTUUID=$partuuid /var ext4 defaults 0 0
 EOF
 
-		unset parttype partuuid
-
-		break
-	done
-
-	unset what
+	unset parttype dev partuuid
 fi
 
 mkdir -p "$dir/loader/entries"
