@@ -33,12 +33,6 @@ find_device_by_partuuid() {
 sed -e "s,^root:[^:]*:,root::," -i "/etc/shadow"
 cat /etc/shadow
 
-cat <<EOF >>/etc/fstab
-/dev/sda1       /efi    vfat    defaults,umask=0077,x-systemd.automount,x-systemd.idle-timeout=1min 0       2
-/dev/sda2       /boot   vfat    defaults                                                            0       2
-EOF
-cat /etc/fstab
-
 if [[ "$HAVE_USR_PARTITION" ]]
 then
 	parttype="8484680c-9521-48c6-9c11-b0720656f69e"
