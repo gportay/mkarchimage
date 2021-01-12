@@ -129,7 +129,7 @@ rootfs.tar: | pacman.conf rootfs
 	sudo -E rsync -av overlay/. rootfs/.
 	sudo -E tar cf $@ -C rootfs .
 
-rootfs mnt:
+rootfs mnt .meta:
 	mkdir -p $@
 
 .PHONY: image-arch-chroot
@@ -250,3 +250,14 @@ disk.sfdisk:
 disk.img.bmap:
 %.bmap: %
 	bmaptool create $^ >$@
+
+.INTERMEDIATE: .meta/image.bmap
+.meta/image.bmap: disk.img.bmap | .meta
+	cp $< $@
+
+disk.img.zip: .meta/image.bmap
+
+.PRECIOUS: %.zip
+%.zip:
+	pigz --zip $*
+	zip $@ $<
