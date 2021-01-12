@@ -241,8 +241,12 @@ CPP = cpp -P
 PREPROCESS.p = $(CPP) $(CPPFLAGS)
 OUTPUT_OPTION = -o $@
 
+.PRECIOUS: disk.sfdisk
+disk.sfdisk:
 %: %.p
 	$(PREPROCESS.p) $(OUTPUT_OPTION) $<
 
+.PRECIOUS: disk.img.bmap
+disk.img.bmap:
 %.bmap: %
 	bmaptool create $^ >$@
