@@ -40,6 +40,22 @@ nconfig:
 config:
 	kconfig-conf --oldaskconfig Kconfig
 
+.PHONY: oldconfig allnoconfig allyesconfig alldefconfig randconfig listnewconfig olddefconfig
+oldconfig allnoconfig allyesconfig alldefconfig randconfig listnewconfig olddefconfig:
+	kconfig-conf --$@ Kconfig
+
+.PHONY: savedefconfig
+savedefconfig:
+	kconfig-conf --$@=defconfig Kconfig
+
+.PHONY: defconfig
+defconfig:
+	kconfig-conf --$@=configs/qemu_defconfig Kconfig
+
+$(foreach defconfig,$(patsubst configs/%,%,$(wildcard configs/*_defconfig)),$(defconfig)):
+%_defconfig:
+	kconfig-conf --defconfig=configs/$@ Kconfig
+
 PACKAGES += $(call qstrip,$(CONFIG_PACKAGES))
 EXTRA_KERNEL_CMDLINE += $(call qstrip,$(CONFIG_EXTRA_KERNEL_CMDLINE))
 export EXTRA_KERNEL_CMDLINE
@@ -92,6 +108,25 @@ ifeq ($(CONFIG_HAVE_HOME_PARTITION)$(CONFIG_ROOT_PARTITION_SIZE),y"")
 CONFIG_ROOT_PARTITION_SIZE = "2G"
 $(warning CONFIG_ROOT_PARTITION_SIZE defaults to $(CONFIG_ROOT_PARTITION_SIZE))
 endif
+
+.PHONY: help
+.SILENT: help
+help:
+	echo  'Configuration targets:'
+	echo  '  config          - Update current config utilising a line-oriented program'
+	echo  '  nconfig         - Update current config utilising a ncurses menu based'
+	echo  '                    program'
+	echo  '  menuconfig      - Update current config utilising a menu based program'
+	echo  '  oldconfig       - Update current config utilising a provided .config as base'
+	echo  '  defconfig       - New config with default from ARCH supplied defconfig'
+	echo  '  savedefconfig   - Save current config as ./defconfig (minimal config)'
+	echo  '  allnoconfig     - New config where all options are answered with no'
+	echo  '  allyesconfig    - New config where all options are accepted with yes'
+	echo  '  alldefconfig    - New config with all symbols set to default'
+	echo  '  randconfig      - New config with random answer to all options'
+	echo  '  listnewconfig   - List new options'
+	echo  '  olddefconfig    - Same as oldconfig but sets new symbols to their'
+	echo  '                    default value without prompting'
 
 .PHONY: all
 all: disk.img
