@@ -19,6 +19,16 @@ config PACKAGES
 	  
 	  https://wiki.archlinux.org/index.php/installation_guide#Install_essential_packages
 
+config EXTRA_KERNEL_CMDLINE
+	string "extra kernel cmdline"
+	default "console=tty1"
+	help
+	  Append extra kernel command-line parameters to bootloader.
+	  
+	  Whitespace separated list of kernel command-line parameters.
+	  
+	  https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html
+
 config TIMEZONE
 	string timezone
 	default "America/Montreal"

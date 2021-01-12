@@ -41,6 +41,8 @@ config:
 	kconfig-conf --oldaskconfig Kconfig
 
 PACKAGES += $(call qstrip,$(CONFIG_PACKAGES))
+EXTRA_KERNEL_CMDLINE += $(call qstrip,$(CONFIG_EXTRA_KERNEL_CMDLINE))
+export EXTRA_KERNEL_CMDLINE
 HAVE_TIMEZONE = $(call qstrip,$(CONFIG_TIMEZONE))
 HAVE_LOCALES = $(call qstrip,$(CONFIG_LOCALES))
 HAVE_HOSTNAME = $(call qstrip,$(CONFIG_HOSTNAME))

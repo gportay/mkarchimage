@@ -115,6 +115,11 @@ then
 	unset parttype dev partuuid
 fi
 
+if [[ "$EXTRA_KERNEL_CMDLINE" ]]
+then
+	options+=("$EXTRA_KERNEL_CMDLINE")
+fi
+
 mkdir -p "$dir/loader/entries"
 for i in /boot/initramfs-*.img
 do
@@ -126,7 +131,7 @@ do
 title   Arch ${pkgbases[*]^}
 linux   /vmlinuz-${pkgbases[0]}
 initrd  /initramfs-$pkgbase.img
-options ${options[*]} console=ttyS0
+options ${options[*]}
 EOF
 	cat "$dir/loader/entries/arch-$pkgbase.conf"
 done
