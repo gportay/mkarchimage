@@ -175,7 +175,7 @@ mrproper: clean
 
 .PHONY: clean
 clean:
-	rm -f disk.sfdisk disk.img rootfs.tar pacman.conf
+	rm -f disk.sfdisk disk.img{,.bmap} rootfs.tar pacman.conf
 	sudo -E rm -Rf rootfs
 
 .PRECIOUS: pacman.conf.in
@@ -243,3 +243,6 @@ OUTPUT_OPTION = -o $@
 
 %: %.p
 	$(PREPROCESS.p) $(OUTPUT_OPTION) $<
+
+%.bmap: %
+	bmaptool create $^ >$@
