@@ -169,7 +169,7 @@ do
 		;;
 	esac
 
-	if [[ "$type" ]]
+	if [[ "${type:-}" ]]
 	then
 		whats["$what"]="$type"
 	fi
