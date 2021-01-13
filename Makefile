@@ -189,7 +189,7 @@ post-image: | disk.img mnt
 
 .PHONY: image-mount
 image-mount: | disk.img mnt
-	sudo -E bash image-mount-root.bash disk.img mnt
+	sudo -E bash image-mount.bash disk.img mnt
 
 .PHONY: post-rootfs
 post-rootfs: EUID = 0
@@ -199,7 +199,7 @@ post-rootfs: | rootfs.tar rootfs
 
 .PHONY: image-overlay
 image-overlay: | disk.img mnt
-	sudo -E bash image-mount-root.bash disk.img mnt \
+	sudo -E bash image-mount.bash disk.img mnt \
 	        rsync -av overlay/. mnt/.
 
 .PHONY: overlay
