@@ -150,7 +150,7 @@ disk.img: | disk.sfdisk rootfs.tar mnt
 	fallocate --length $(IMAGE_SIZE) $@.tmp
 	sfdisk $@.tmp <disk.sfdisk
 	sfdisk --dump $@.tmp
-	sudo -E bash image-mkfs-all.bash $@.tmp mnt
+	sudo -E bash image-mkfs.bash $@.tmp mnt
 	sudo -E bash image-tar-root.bash $@.tmp mnt rootfs.tar
 	sudo -E bash image-arch-chroot.bash $@.tmp mnt \
 		bash <post-image.bash
