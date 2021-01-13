@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2020 Gaël PORTAY
+# Copyright (C) 2020-2021 Gaël PORTAY
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
@@ -22,4 +22,4 @@ file="$1"
 shift
 
 exec bash losetup.bash "$file" \
-     bash mkfs-all.bash '$dev' "$@"
+     bash mkfs.bash '$dev' "$@"
