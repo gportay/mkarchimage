@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2020 Gaël PORTAY
+# Copyright (C) 2020-2021 Gaël PORTAY
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
@@ -25,4 +25,4 @@ shift
 shift
 
 exec bash losetup.bash "$image" \
-     bash mount-root.bash '$dev' "$mountpoint" "$@"
+     bash mount.bash '$dev' "$mountpoint" "$@"
