@@ -151,7 +151,7 @@ disk.img: | disk.sfdisk rootfs.tar mnt
 	sfdisk $@.tmp <disk.sfdisk
 	sfdisk --dump $@.tmp
 	sudo -E bash image-mkfs.bash $@.tmp mnt
-	sudo -E bash image-tar-root.bash $@.tmp mnt rootfs.tar
+	sudo -E bash image-tar.bash $@.tmp mnt rootfs.tar
 	sudo -E bash image-arch-chroot.bash $@.tmp mnt \
 		bash <post-image.bash
 	mv $@.tmp $@
