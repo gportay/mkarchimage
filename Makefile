@@ -112,6 +112,11 @@ endif
 .PHONY: help
 .SILENT: help
 help:
+	echo  'Cleaning targets:'
+	echo  '  clean           - Remove most generated files but keep the config and'
+	echo  '                    enough build support to build external modules'
+	echo  '  mrproper        - Remove all generated files + config + various backup files'
+	echo  ''
 	echo  'Configuration targets:'
 	echo  '  config          - Update current config utilising a line-oriented program'
 	echo  '  nconfig         - Update current config utilising a ncurses menu based'
@@ -127,6 +132,14 @@ help:
 	echo  '  listnewconfig   - List new options'
 	echo  '  olddefconfig    - Same as oldconfig but sets new symbols to their'
 	echo  '                    default value without prompting'
+	echo  'Other generic targets:'
+	echo  '  all             - Build all targets marked with [*]'
+	echo  '* rootfs.tar      - Build the rootfs archive'
+	echo  '* disk.img        - Build the disk image'
+	echo  '  disk.img.zip    - Build the zip archive for Etcher'
+	echo  '  run-qemu        - Run the disk image within Qemu'
+	echo  '  run-remote-viewer'
+	echo  '                  - Run the remote desktop client'
 
 .PHONY: all
 all: disk.img
