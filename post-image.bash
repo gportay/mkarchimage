@@ -109,10 +109,26 @@ then
 	parttype="4d21b016-b534-45c2-a9fb-5c16e091fd2d"
 	read -r dev partuuid < <(find_device_by_partuuid "$parttype")
 
-	cat <<EOF >>/etc/fstab
-PARTUUID=$partuuid /var ext4 defaults 0 0
-EOF
-	cat /etc/fstab
+	# systemd src/shared/dissect-image.c:
+	#
+	# For /var we insist that the uuid of the partition matches the
+	# HMAC-SHA256 of the /var GPT partition type uuid, keyed by machine ID.
+	# Why? Unlike the other partitions /var is inherently installation
+	# specific, hence we need to be careful not to mount it in the wrong
+	# installation. By hashing the partition UUID from /etc/machine-id we
+	# can securely bind the partition to the installation.
+	# openssl dgst -sha256 -mac hmac -macopt hexkey:0ea3e228b8d8450aa411974c3a6de537 data.bin
+	machine_id="$(cat /etc/machine-id)"
+	hash="$(printf "\x4d\x21\xb0\x16\xb5\x34\x45\xc2\xa9\xfb\x5c\x16\xe0\x91\xfd\x2d" | \
+	        openssl dgst -sha256 -mac hmac -macopt "hexkey:$machine_id" -binary | \
+	        xxd -p -l16)"
+	# Set UUID version to 4 --- truly random generation
+	byte06="$(printf "%02x" "$(((0x${hash:12:2} & 0x0f) | 0x40))")"
+	# Set the UUID variant to DCE
+	byte08="$(printf "%02x" "$(((0x${hash:16:2} & 0x3f) | 0x80))")"
+	hash="${hash:0:12}$byte06${hash:14:2}$byte08${hash:18}"
+	uuid="${hash:0:8}-${hash:8:4}-${hash:12:4}-${hash:16:4}-${hash:20:12}"
+	sfdisk --part-uuid "$LOOPDEVICE" "${dev##${LOOPDEVICE}p}" "$uuid"
 
 	unset parttype dev partuuid
 fi
