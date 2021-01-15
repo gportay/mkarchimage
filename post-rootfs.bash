@@ -40,3 +40,5 @@ cat /etc/hostname
 
 systemctl enable systemd-networkd.service
 systemctl enable systemd-resolved.service
+
+pacman -Q
