@@ -6,6 +6,7 @@
 #
 
 set -e
+set -o pipefail
 
 find_device_by_partuuid() {
 	local what
@@ -30,10 +31,37 @@ find_device_by_partuuid() {
 	return 1
 }
 
+options=()
+
 sed -e "s,^root:[^:]*:,root::," -i "/etc/shadow"
 cat /etc/shadow
 
-if [[ "$HAVE_USR_PARTITION" ]]
+if [[ "$HAVE_USR_VERITY_PARTITION" ]]
+then
+	parttype="8484680c-9521-48c6-9c11-b0720656f69e"
+	read -r data_dev data_partuuid < <(find_device_by_partuuid "$parttype")
+
+	parttype="77ff5f63-e7b6-4633-acf4-1565b864c0e6"
+	read -r hash_dev hash_partuuid < <(find_device_by_partuuid "$parttype")
+
+	tune2fs -O "verity,read-only" "$data_dev"
+	mount -oremount,ro /usr
+	roothash="$(veritysetup format "$data_dev" "$hash_dev" |
+		    tee /dev/stderr | \
+		    sed -n '/^Root hash:/s,Root hash:[[:blank:]]*,,p')"
+	sfdisk --part-attrs "$LOOPDEVICE" "${data_dev##${LOOPDEVICE}p}" GUID:60
+	cat <<EOF >>/etc/veritytab
+usr PARTUUID=$data_partuuid PARTUUID=$hash_partuuid $roothash auto
+EOF
+	cat /etc/veritytab
+
+	cat <<EOF >>/etc/fstab.sys
+/dev/mapper/usr /usr auto defaults 0 0
+EOF
+	cat /etc/fstab.sys
+
+	unset parttype data_dev data_partuuid hash_dev hash_partuuid roothash
+elif [[ "$HAVE_USR_PARTITION" ]]
 then
 	parttype="8484680c-9521-48c6-9c11-b0720656f69e"
 	read -r dev partuuid < <(find_device_by_partuuid "$parttype")
@@ -52,6 +80,8 @@ fi
 
 # Run pacman hook for dracut manually as it is a part of the overlay which is
 # install after the rootfs is built with pacstrap.
+#
+# The initrd images *MUST* be regenerated in case of a separate /usr partition.
 if [[ -x /usr/bin/dracut ]]
 then
 	compgen -G usr/lib/modules/"*"/pkgbase | dracut-install.sh
@@ -103,7 +133,26 @@ EOF
 	unset mountpoint parttype dev partuuid
 fi
 
-if [[ "$READ_ONLY" ]]
+if [[ "$HAVE_ROOT_VERITY_PARTITION" ]]
+then
+	parttype="4f68bce3-e8cd-4db1-96e7-fbcaf984b709"
+	read -r data_dev data_partuuid < <(find_device_by_partuuid "$parttype")
+
+	parttype="2c7357ed-ebd2-46d9-aec1-23d437ec2bf5"
+	read -r hash_dev hash_partuuid < <(find_device_by_partuuid "$parttype")
+
+	tune2fs -O "verity,read-only" "$data_dev"
+	mount -oremount,ro /
+	roothash="$(veritysetup format "$data_dev" "$hash_dev" |
+		    tee /dev/stderr | \
+		    sed -n '/^Root hash:/s,Root hash:[[:blank:]]*,,p')"
+	options+=("roothash=$roothash")
+	options+=("systemd.verity_root_data=PARTUUID=$data_partuuid")
+	options+=("systemd.verity_root_hash=PARTUUID=$hash_partuuid")
+	sfdisk --part-attrs "$LOOPDEVICE" "${data_dev##${LOOPDEVICE}p}" GUID:60
+
+	unset parttype data_dev data_partuuid hash_dev hash_partuuid roothash
+elif [[ "$READ_ONLY" ]]
 then
 	parttype="4f68bce3-e8cd-4db1-96e7-fbcaf984b709"
 	read -r dev partuuid < <(find_device_by_partuuid "$parttype")

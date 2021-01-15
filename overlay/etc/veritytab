@@ -1,0 +1,7 @@
+# Configuration for verified block devices.
+# See veritytab(5) for details.
+
+# NOTE: Do not list your root (/) partition here, it must be set up
+#       beforehand by the initramfs (/etc/mkinitcpio.conf).
+
+# <volume name> <data device> <hash device> <roothash> <options>

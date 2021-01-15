@@ -70,6 +70,12 @@ config READ_ONLY
 	bool read-only
 	select HAVE_VARIABLE_DATA_PARTITION
 
+config VERITYSETUP
+	bool veritysetup
+	depends on READ_ONLY
+	select HAVE_ROOT_VERITY_PARTITION
+	default n
+
 menu "GUID Partition Table"
 
 config FORCE_PARTITIONS
@@ -108,6 +114,37 @@ config ROOT_PARTITION_NAME
 	depends on HAVE_ROOT_PARTITION
 	help
 
+config HAVE_ROOT_VERITY_PARTITION
+	bool "Root Verity Partition"
+	depends on VERITYSETUP
+	depends on HAVE_ROOT_PARTITION
+	help
+	  A dm-verity superblock followed by hash data
+	  
+	  On systems with matching architecture, contains dm-verity integrity
+	  hash data for the matching root partition. If this feature is used
+	  the partition UUID of the root partition should be the first 128bit
+	  of the root hash of the dm-verity hash data, and the partition UUID
+	  of this dm-verity partition should be the final 128bit of it, so that
+	  the root partition and its verity partition can be discovered easily,
+	  simply by specifying the root hash.
+
+config ROOT_VERITY_PARTITION_SIZE
+	string "Root Verity Partition Size"
+	default "32M"
+	depends on HAVE_ROOT_VERITY_PARTITION
+	help
+	  Specify the partition size in sectors. The number may be followed by
+	  the multiplicative suffixes (KiB, MiB, GiB, TiB, PiB, EiB, ZiB and
+	  YiB), then it's interpreted as size in bytes and the size is aligned
+	  according to device I/O limits.
+
+config ROOT_VERITY_PARTITION_NAME
+	string "Root Verity Partition Name"
+	default "root-verity"
+	depends on HAVE_ROOT_VERITY_PARTITION
+	help
+
 config HAVE_USR_PARTITION
 	bool "/usr/ Partition"
 	help
@@ -129,6 +166,32 @@ config USR_PARTITION_NAME
 	string "/usr Partition Name"
 	default "usr"
 	depends on HAVE_USR_PARTITION
+	help
+
+config HAVE_USR_VERITY_PARTITION
+	bool "/usr Verity Partition"
+	depends on VERITYSETUP
+	depends on HAVE_USR_PARTITION
+	help
+	  A dm-verity superblock followed by hash data
+	  
+	  Similar semantics to root Verity partition, but just for the /usr/
+	  partition.
+
+config USR_VERITY_PARTITION_SIZE
+	string "/usr Verity Partition Size"
+	default "32M"
+	depends on HAVE_USR_VERITY_PARTITION
+	help
+	  Specify the partition size in sectors. The number may be followed by
+	  the multiplicative suffixes (KiB, MiB, GiB, TiB, PiB, EiB, ZiB and
+	  YiB), then it's interpreted as size in bytes and the size is aligned
+	  according to device I/O limits.
+
+config USR_VERITY_PARTITION_NAME
+	string "/usr Verity Partition Name"
+	default "usr-verity"
+	depends on HAVE_USR_VERITY_PARTITION
 	help
 
 config HAVE_HOME_PARTITION
