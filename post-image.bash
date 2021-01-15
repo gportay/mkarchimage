@@ -87,6 +87,15 @@ then
 	compgen -G usr/lib/modules/"*"/pkgbase | dracut-install.sh
 fi
 
+# Force usage of the fallback initramfs image which contains all modules needed
+# boot every single machine in the world (i.e it is not striped to contain host
+# modules only).
+for i in /boot/initramfs-*fallback.img
+do
+	[[ -e "$i" ]] || continue
+	cp -f "$i" "${i/-fallback/}"
+done
+
 mkdir -p /efi/loader
 cat <<EOF >/efi/loader/loader.conf
 default  arch.conf
