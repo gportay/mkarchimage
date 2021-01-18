@@ -232,7 +232,7 @@ overlay: | rootfs.tar rootfs
 
 .PHONY: mrproper
 mrproper: clean
-	rm -f .config mirrorlist
+	rm -f .config mirrorlist pacman.conf.in
 
 .PHONY: clean
 clean:
