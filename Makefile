@@ -232,19 +232,25 @@ overlay: | rootfs.tar rootfs
 
 .PHONY: mrproper
 mrproper: clean
-	rm -f .config
+	rm -f .config mirrorlist
 
 .PHONY: clean
 clean:
 	rm -f disk.sfdisk disk.img{,.bmap} rootfs.tar pacman.conf
 	sudo -E rm -Rf rootfs
 
+.PRECIOUS: mirrorlist
+mirrorlist:
+	wget "https://archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4" --output-document $@.tmp
+	sed -e '/## Worldwide/,/^$$/s,^#,,' -i $@.tmp
+	mv $@.tmp $@
+
 .PRECIOUS: pacman.conf.in
 pacman.conf.in:
 	wget https://git.archlinux.org/pacman.git/plain/etc/pacman.conf.in
 
 .PRECIOUS: pacman.conf
-pacman.conf: pacman.conf.in
+pacman.conf: pacman.conf.in | mirrorlist
 	sed -e 's,@ROOTDIR@,/,' \
 	    -e 's,@sysconfdir@,/etc,' \
 	    -e 's,@localstatedir@,/var,' \
