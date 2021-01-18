@@ -8,8 +8,10 @@ SHELL = /bin/bash
 
 QEMU ?= qemu-system-x86_64
 QEMU += -enable-kvm -m 4G -machine q35 -smp 4 -cpu host
+ifndef NO_SPICE
 QEMU += -vga virtio -display egl-headless,gl=on
 QEMU += -spice port=5924,disable-ticketing -device virtio-serial-pci -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 -chardev spicevmc,id=spicechannel0,name=vdagent
+endif
 QEMU += -serial mon:stdio
 QEMU += -drive format=raw,file=/usr/share/ovmf/x64/OVMF_CODE.fd,readonly,if=pflash -drive format=raw,file=OVMF_VARS.fd,if=pflash
 
