@@ -185,6 +185,7 @@ then
 	tune2fs -O read-only "$dev"
 	mount -o remount,ro /
 	options+=("ro")
+	sfdisk --part-attrs "$LOOPDEVICE" "${dev##${LOOPDEVICE}p}" GUID:60
 
 	unset parttype dev partuuid
 fi
