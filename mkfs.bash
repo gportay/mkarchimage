@@ -19,7 +19,7 @@ EOF
 fi
 
 dev="$1"
-declare -A whats
+declare -A types
 for what in "${dev}"p*
 do
 	[[ -b "$what" ]] || continue
@@ -171,15 +171,15 @@ do
 
 	if [[ "${type:-}" ]]
 	then
-		whats["$what"]="$type"
+		types["$what"]="$type"
 	fi
 
 	unset type parttype
 done
 
-for what in "${!whats[@]}"
+for what in "${!types[@]}"
 do
-	type="${whats[$what]}"
+	type="${types[$what]}"
 	if [[ "$type" == "swap" ]]
 	then
 		mkswap "$what"
